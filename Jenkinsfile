@@ -67,20 +67,20 @@ pipeline {
         success {
             echo "Build and push successful!"
             // Optional: send email on success
-            // emailext(
-            //     subject: "SUCCESS: $JOB_NAME #$BUILD_NUMBER",
-            //     body: "Build SUCCESS: Check details at $BUILD_URL",
-            //     to: "dikshant.mahawar012@gmail.com"
-            // )
+            emailext(
+                subject: "SUCCESS: $JOB_NAME #$BUILD_NUMBER",
+                body: "Build SUCCESS: Check details at $BUILD_URL",
+                to: "dikshant.mahawar012@gmail.com"
+            )
         }
         failure {
             echo "Build failed. Check console output for details."
             // Optional: send email on failure
-            // emailext(
-            //     subject: "FAILURE: $JOB_NAME #$BUILD_NUMBER",
-            //     body: "Build FAILED: Check details at $BUILD_URL",
-            //     to: "dikshant.mahawar012@gmail.com"
-            // )
+            emailext(
+                subject: "FAILURE: $JOB_NAME #$BUILD_NUMBER",
+                body: "Build FAILED: Check details at $BUILD_URL",
+                to: "dikshant.mahawar012@gmail.com"
+            )
         }
     }
 }
