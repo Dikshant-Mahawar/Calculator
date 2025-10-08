@@ -30,30 +30,34 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',   // make sure ID matches Jenkins
-                    usernameVariable: 'DOCKER_HUB_USER',
-                    passwordVariable: 'DOCKER_HUB_PASS'
-                )]) {
-                    sh '''
-                        echo "Building Docker image..."
-                        docker build -t "$DOCKER_HUB_USER"/calculator-app:latest .
-                    '''
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_HUB_USER',
+                        passwordVariable: 'DOCKER_HUB_PASS'
+                    )]) {
+                        sh '''
+                            echo "Building Docker image..."
+                            docker build -t "$DOCKER_HUB_USER"/calculator-app:latest .
+                        '''
+                    }
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',
-                    usernameVariable: 'DOCKER_HUB_USER',
-                    passwordVariable: 'DOCKER_HUB_PASS'
-                )]) {
-                    sh '''
-                        echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                        docker push "$DOCKER_HUB_USER"/calculator-app:latest
-                    '''
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: 'dockerhub-credentials',
+                        usernameVariable: 'DOCKER_HUB_USER',
+                        passwordVariable: 'DOCKER_HUB_PASS'
+                    )]) {
+                        sh '''
+                            echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+                            docker push "$DOCKER_HUB_USER"/calculator-app:latest
+                        '''
+                    }
                 }
             }
         }
@@ -62,9 +66,21 @@ pipeline {
     post {
         success {
             echo "Build and push successful!"
+            // Optional: send email on success
+            // emailext(
+            //     subject: "SUCCESS: $JOB_NAME #$BUILD_NUMBER",
+            //     body: "Build SUCCESS: Check details at $BUILD_URL",
+            //     to: "dikshant.mahawar012@gmail.com"
+            // )
         }
         failure {
-            echo Build failed. Check console output for details."
+            echo "Build failed. Check console output for details."
+            // Optional: send email on failure
+            // emailext(
+            //     subject: "FAILURE: $JOB_NAME #$BUILD_NUMBER",
+            //     body: "Build FAILED: Check details at $BUILD_URL",
+            //     to: "dikshant.mahawar012@gmail.com"
+            // )
         }
     }
 }
