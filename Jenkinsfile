@@ -30,23 +30,28 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    echo "Building Docker image..."
-                    docker build -t calculator-app .
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',   // make sure ID matches Jenkins
+                    usernameVariable: 'DOCKER_HUB_USER',
+                    passwordVariable: 'DOCKER_HUB_PASS'
+                )]) {
+                    sh '''
+                        echo "Building Docker image..."
+                        docker build -t "$DOCKER_HUB_USER"/calculator-app:latest .
+                    '''
+                }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-credentials',   // ✅ Must match your Jenkins credential ID
+                    credentialsId: 'dockerhub-credentials',
                     usernameVariable: 'DOCKER_HUB_USER',
                     passwordVariable: 'DOCKER_HUB_PASS'
                 )]) {
                     sh '''
                         echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                        docker tag calculator-app "$DOCKER_HUB_USER"/calculator-app:latest
                         docker push "$DOCKER_HUB_USER"/calculator-app:latest
                     '''
                 }
@@ -56,10 +61,10 @@ pipeline {
 
     post {
         success {
-            echo "Build and push successful!"
+            echo "✅ Build and push successful!"
         }
         failure {
-            echo "Build failed. Check console output for details."
+            echo "❌ Build failed. Check console output for details."
         }
     }
 }
