@@ -1,6 +1,12 @@
 pipeline {
     agent any
 
+    environment {
+        PATH = "/opt/homebrew/Cellar/maven/3.9.11/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
+        DOCKER_HUB_USER = 'dikshant0012'
+        DOCKER_HUB_PASS = credentials('dockerhub-credentials-id')
+    }
+
     stages {
         stage('Clone Repository') {
             steps {
@@ -10,7 +16,11 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                sh '''
+                    echo "Using Maven version:"
+                    mvn -version
+                    mvn clean package
+                '''
             }
         }
 
@@ -22,22 +32,30 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t calculator-app .'
+                sh '''
+                    echo "Building Docker image..."
+                    docker build -t calculator-app .
+                '''
             }
         }
 
         stage('Push to Docker Hub') {
-            environment {
-                DOCKER_HUB_USER = 'dikshant0012'
-                DOCKER_HUB_PASS = credentials('dockerhub-credentials-id')
-            }
             steps {
                 sh '''
-                echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                docker tag calculator-app $DOCKER_HUB_USER/calculator-app:latest
-                docker push $DOCKER_HUB_USER/calculator-app:latest
+                    echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+                    docker tag calculator-app $DOCKER_HUB_USER/calculator-app:latest
+                    docker push $DOCKER_HUB_USER/calculator-app:latest
                 '''
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Build and push successful!"
+        }
+        failure {
+            echo "Build failed. Check console output for details."
         }
     }
 }
