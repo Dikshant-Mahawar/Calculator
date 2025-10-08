@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Dikshant-Mahawar/Calculator.git'
+                git branch: 'main', url: 'https://github.com/Dikshant-Mahawar/Calculator.git'
             }
         }
 
