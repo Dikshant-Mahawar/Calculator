@@ -1,0 +1,28 @@
+---
+- name: Pull latest Docker image
+  docker_image:
+    name: dikshant0012/calculator-app
+    tag: latest
+    source: pull
+
+- name: Stop old container if running
+  docker_container:
+    name: calculator-app
+    state: stopped
+    force_kill: yes
+  ignore_errors: yes
+
+- name: Remove old container
+  docker_container:
+    name: calculator-app
+    state: absent
+  ignore_errors: yes
+
+- name: Run new container
+  docker_container:
+    name: calculator-app
+    image: dikshant0012/calculator-app:latest
+    state: started
+    restart_policy: always
+    ports:
+      - "8080:8080"

@@ -7,12 +7,35 @@
     - name: Pull the latest Docker image from Docker Hub
       community.docker.docker_image:
         name: dikshant0012/calculator-app
+        tag: latest
         source: pull
+
+    - name: Stop existing Calculator container if running
+      community.docker.docker_container:
+        name: calculator
+        state: stopped
+      ignore_errors: true
+
+    - name: Remove old Calculator container if exists
+      community.docker.docker_container:
+        name: calculator
+        state: absent
+      ignore_errors: true
 
     - name: Run the Calculator App container
       community.docker.docker_container:
         name: calculator
         image: dikshant0012/calculator-app:latest
         state: started
+        restart_policy: always
+        ports:
+          - "8080:8080"
         tty: true
         interactive: true
+
+    - name: Verify container is running
+      command: docker ps
+      register: docker_status
+
+    - debug:
+        msg: "{{ docker_status.stdout_lines }}"
