@@ -61,22 +61,31 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy Locally via Ansible') {
+            steps {
+                script {
+                    sh '''
+                        echo "Deploying Calculator app using Ansible..."
+                        ansible-playbook -i inventory.ini deploy_calculator.yml
+                    '''
+                }
+            }
+        }
     }
 
     post {
         success {
-            echo "Build and push successful!"
-            // Optional: send email on success
+            echo "Build, push, and deployment successful!"
             mail to: "dikshant.mahawar012@gmail.com",
                 subject: "SUCCESS: $JOB_NAME #$BUILD_NUMBER",
-                body: "Build SUCCESS: Check details at $BUILD_URL"
+                body: "Build and Deployment SUCCESS: Check details at $BUILD_URL"
         }
         failure {
-            echo "Build failed. Check console output for details."
-            // Optional: send email on failure
+            echo "Build or deployment failed. Check console output."
             mail to: "dikshant.mahawar012@gmail.com",
-                subject: "Failure: $JOB_NAME #$BUILD_NUMBER",
-                body: "Build Failure: Check details at $BUILD_URL"
+                subject: "FAILURE: $JOB_NAME #$BUILD_NUMBER",
+                body: "Build or Deployment FAILED: Check details at $BUILD_URL"
         }
     }
 }
