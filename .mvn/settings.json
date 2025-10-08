@@ -1,0 +1,10 @@
+{
+    "java.configuration.runtimes": [
+      {
+        "name": "JavaSE-20",
+        "path": "/Library/Java/JavaVirtualMachines/temurin-20.jdk/Contents/Home",
+        "default": true
+      }
+    ]
+  }
+  
