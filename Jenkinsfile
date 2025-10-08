@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         PATH = "/opt/homebrew/Cellar/maven/3.9.11/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
-        DOCKER_HUB_USER = 'dikshant0012'
-        DOCKER_HUB_PASS = credentials('dockerhub-credentials-id')
     }
 
     stages {
@@ -41,11 +39,17 @@ pipeline {
 
         stage('Push to Docker Hub') {
             steps {
-                sh '''
-                    echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
-                    docker tag calculator-app $DOCKER_HUB_USER/calculator-app:latest
-                    docker push $DOCKER_HUB_USER/calculator-app:latest
-                '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',   // ✅ Must match your Jenkins credential ID
+                    usernameVariable: 'DOCKER_HUB_USER',
+                    passwordVariable: 'DOCKER_HUB_PASS'
+                )]) {
+                    sh '''
+                        echo "$DOCKER_HUB_PASS" | docker login -u "$DOCKER_HUB_USER" --password-stdin
+                        docker tag calculator-app "$DOCKER_HUB_USER"/calculator-app:latest
+                        docker push "$DOCKER_HUB_USER"/calculator-app:latest
+                    '''
+                }
             }
         }
     }
