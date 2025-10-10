@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Main {
     // Add webhooks 
     // Final Webhooks
+    // New webhook added
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
         MathLib calculator = new MathLib();
