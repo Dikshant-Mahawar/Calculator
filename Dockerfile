@@ -13,8 +13,11 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 
-# Copy the built JAR from build stage
+# Create logs directory for logback
+RUN mkdir -p logs
+
+# Copy the built JAR
 COPY --from=build /app/target/calculator-1.0-SNAPSHOT.jar app.jar
 
-# Run the app
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
