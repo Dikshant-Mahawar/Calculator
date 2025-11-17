@@ -1,0 +1,12 @@
+{
+    "mappings": {
+      "properties": {
+        "timestamp": { "type": "date" },
+        "level": { "type": "keyword" },
+        "message": { "type": "text" },
+        "durationMs": { "type": "long" },
+        "service": { "type": "keyword" }
+      }
+    }
+  }
+  
